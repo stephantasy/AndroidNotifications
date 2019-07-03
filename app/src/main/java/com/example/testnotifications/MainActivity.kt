@@ -5,9 +5,11 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.iid.FirebaseInstanceId
 import kotlinx.android.synthetic.main.activity_main.*
+import android.content.Intent
+
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -37,6 +39,43 @@ class MainActivity : AppCompatActivity() {
         }
 
 
+        Log.v(TAG, "=======================================")
+        val extras = intent.extras
+        if (extras != null) {
+            val poop = extras.get(Intent.EXTRA_KEY_EVENT)
+            // get data via the key
+            val value1 = extras.getString(Intent.EXTRA_TEXT)
+            if (value1 != null) {
+                Log.v(MainActivity.TAG, value1)
+            }
+
+            if (extras != null) {
+                for (key in extras.keySet()) {
+                    val value = extras.get(key)
+                    Log.d("Activity onResume", "Key: $key Value: $value")
+                }
+            }
+
+            // THIS WORKS!
+            if(extras.get("OpenPage") != null){
+                loadPage2()
+            }
+        }
+        Log.v(TAG, "=======================================")
+
+
+
+        bt_Page1.setOnClickListener {
+            loadPage2()
+        }
+
+
+    }
+
+    private fun loadPage2() {
+        val i = Intent(this@MainActivity, Page2Activity::class.java)
+        startActivity(i)
+        finish()
     }
 
     companion object {

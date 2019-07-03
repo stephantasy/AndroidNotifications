@@ -33,11 +33,13 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
         // TODO(developer): Handle FCM messages here.
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
-        Log.d(TAG, "From: ${remoteMessage?.from}")
+        Log.d(TAG, "++++++++++++++++++++++++++++++++++++++")
+        Log.d(TAG, "From: ${remoteMessage?.notification}")
+        Log.d(TAG, "++++++++++++++++++++++++++++++++++++++")
 
         // Check if message contains a data payload.
         remoteMessage?.data?.isNotEmpty()?.let {
-            Log.d(TAG, "Message data payload: $remoteMessage.data")
+            Log.d(TAG, "Message data payload: ${remoteMessage.data}")
 
             if (/* Check if data needs to be processed by long running job */ false) {
                 // For long-running tasks (10 seconds or more) use WorkManager.
