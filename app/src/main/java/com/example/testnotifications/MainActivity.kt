@@ -8,7 +8,7 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.iid.FirebaseInstanceId
 import kotlinx.android.synthetic.main.activity_main.*
 import android.content.Intent
-
+import android.view.View
 
 
 class MainActivity : AppCompatActivity() {
@@ -49,6 +49,7 @@ class MainActivity : AppCompatActivity() {
                 Log.v(MainActivity.TAG, value1)
             }
 
+            // List all data
             if (extras != null) {
                 for (key in extras.keySet()) {
                     val value = extras.get(key)
@@ -76,6 +77,11 @@ class MainActivity : AppCompatActivity() {
         val i = Intent(this@MainActivity, Page2Activity::class.java)
         startActivity(i)
         finish()
+    }
+
+    // Send notification to itself
+    fun sendNotificationToMe(v: View){
+
     }
 
     companion object {
