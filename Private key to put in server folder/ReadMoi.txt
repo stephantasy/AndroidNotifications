@@ -1,0 +1,7 @@
+Ces fichiers permettent de faire fonctionner les notifications avec cette appli.
+
+Voir le code serveur de CSSF > Simplify pour l'implémentation 
+OU 
+utiliser l'outil Firebase pour faire des tests (https://console.firebase.google.com/project/simplyfi-85142/notification/compose)
+
+DeviceToken Mon tel: cC6htAMkqAc:APA91bFcTW_fN1d8WATnrAGMyjBcEyO8owMsd802JDRV0WBq0pJmFsTVAysr7A4nk4lSdwir2qcaCXtpoJjH1cQkgPS4FxniK47GOWGyqY3MiTnHCqB4S1ws1Ve5u2312iL6fkbvWVhO
