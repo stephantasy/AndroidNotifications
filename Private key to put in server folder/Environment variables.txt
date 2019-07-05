@@ -1,2 +1,0 @@
-GOOGLE_APPLICATION_CREDENTIALS=testnotifications-f26c1-firebase-adminsdk-9hcoi-994d336b68.json
-FIREBASE_DATABASE_URL=https://testnotifications-f26c1.firebaseio.com
