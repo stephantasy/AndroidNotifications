@@ -1,5 +1,7 @@
 package com.sby.android.notification;
 
+import com.sby.android.notification.entities.User;
+import com.sby.android.notification.repositories.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,6 +16,7 @@ import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.Locale;
+import java.util.UUID;
 
 
 @SpringBootApplication
@@ -40,12 +43,21 @@ public class NotificationApplication {
 @Component
 class DataBootstrap implements CommandLineRunner {
 
-    public DataBootstrap() {
+    private UserRepository userRepository;
+
+    public DataBootstrap(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
     public void run(String... args) throws Exception {
+        var user = new User(UUID.fromString("3fb9c8d8-c703-4bd5-97bd-a0a117414f7b"),
+                "cC6htAMkqAc:APA91bFcTW_fN1d8WATnrAGMyjBcEyO8owMsd802JDRV0WBq0pJmFsTVAysr7A4nk4lSdwir2qcaCXtpoJjH1cQkgPS4FxniK47GOWGyqY3MiTnHCqB4S1ws1Ve5u2312iL6fkbvWVhO",
+                null);
 
+        if(!userRepository.existsById(user.getId())) {
+            userRepository.save(user);
+        }
     }
 
 }

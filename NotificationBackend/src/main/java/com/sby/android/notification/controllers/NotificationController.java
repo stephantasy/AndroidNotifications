@@ -26,14 +26,14 @@ public class NotificationController {
     }
 
 
-    @RequestMapping(value = "/send/user", method = RequestMethod.POST)
+    @RequestMapping(value = "/send/user/", method = RequestMethod.POST)
     @ApiOperation(value = "Send a notification to a specific User")
     public String sendNotificationToUser(@RequestParam UUID recipientId){
         User user = userService.getUserById(recipientId);
         return notificationService.sendNotification(user.getDeviceToken());
     }
 
-    @RequestMapping(value = "/send/token", method = RequestMethod.POST)
+    @RequestMapping(value = "/send/token/", method = RequestMethod.POST)
     @ApiOperation(value = "Send a notification to a specific User")
     public String sendNotificationToToken(@RequestParam String deviceToken){
         return notificationService.sendNotification(deviceToken);
@@ -43,6 +43,14 @@ public class NotificationController {
     @ApiOperation(value = "Subscribe to a topic")
     public String subscribeToTopic(){
         return "";
+    }
+
+
+
+    @RequestMapping(value = "/testGet/", method = RequestMethod.GET)
+    @ApiOperation(value = "Test a get action")
+    public String testGet(){
+        return "Get worked!!!";
     }
 
 }
