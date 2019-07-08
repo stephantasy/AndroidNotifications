@@ -32,11 +32,14 @@
         <RadioButton
                 android:text="English"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:id="@+id/rb_English" android:layout_weight="1"/>
+                android:layout_height="wrap_content"
+                android:id="@+id/rb_English"
+                android:checked="true"/>
         <RadioButton
                 android:text="Français"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:id="@+id/rb_french" android:layout_weight="1"/>
+                android:layout_height="wrap_content"
+                android:id="@+id/rb_french"/>
     </RadioGroup>
     <Button
             android:id="@+id/bt_Page1"
@@ -66,11 +69,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/bt_SendToMe"
-                android:layout_margin="5dp" android:onClick="sendNotificationToMe"/>
+                android:layout_margin="5dp"
+                android:onClick="sendNotificationToMe"/>
         <Button
                 android:text="Send Notification to Topic"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:id="@+id/bt_SendToTopic" android:layout_margin="5dp"/>
+                android:layout_height="wrap_content"
+                android:id="@+id/bt_SendToTopic"
+                android:layout_margin="5dp"
+                android:onClick="sendNotificationToTopic"/>
+        <Button
+                android:text="Test GET From API"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/bt_TestGetFromApi"
+                android:layout_margin="5dp"
+                android:onClick="testGetFromApi"/>
     </LinearLayout>
     <Button
             android:id="@+id/logTokenButton"
