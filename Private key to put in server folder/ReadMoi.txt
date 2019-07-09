@@ -5,3 +5,11 @@ OU
 utiliser l'outil Firebase pour faire des tests (https://console.firebase.google.com/project/simplyfi-85142/notification/compose)
 
 DeviceToken Mon tel: cC6htAMkqAc:APA91bFcTW_fN1d8WATnrAGMyjBcEyO8owMsd802JDRV0WBq0pJmFsTVAysr7A4nk4lSdwir2qcaCXtpoJjH1cQkgPS4FxniK47GOWGyqY3MiTnHCqB4S1ws1Ve5u2312iL6fkbvWVhO
+
+https://iid.googleapis.com/iid/info/testnotifications-f26c1?details=true
+Content-Type:application/json
+Authorization:key=AAAAaMWQX3s:APA91bEnE2YUCCG4yvv9YJ11s-YzAQtpIIvQ2jHSYxYERovQ3j2Q2VfZt3_-hS9XNur4dciTugvr7wItySmaTr6Ba_XwqN-g7M79nX0qpm6EBBn_yVtyx0byg0h6sS8Wwn402fQau01V
+
+https://iid.googleapis.com/iid/info/testnotifications-f26c1?details=true
+Authorization:key=AAAAaMWQX3s:APA91bEnE2YUCCG4yvv9YJ11s-YzAQtpIIvQ2jHSYxYERovQ3j2Q2VfZt3_-hS9XNur4dciTugvr7wItySmaTr6Ba_XwqN-g7M79nX0qpm6EBBn_yVtyx0byg0h6sS8Wwn402fQau01V
+

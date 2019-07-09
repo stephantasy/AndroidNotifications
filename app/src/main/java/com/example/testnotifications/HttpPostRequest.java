@@ -21,7 +21,12 @@ public class HttpPostRequest extends AsyncTask<String, Void, String>
         String result;
         String inputLine;
         try {
+            // Create the data
+            String myData = params[1];
+
+
             //Create a URL object holding our url
+            //URL myUrl = new URL(stringUrl + "?" + myData);
             URL myUrl = new URL(stringUrl);
 
             //Create a connection
@@ -32,12 +37,11 @@ public class HttpPostRequest extends AsyncTask<String, Void, String>
             connection.setReadTimeout(READ_TIMEOUT);
             connection.setConnectTimeout(CONNECTION_TIMEOUT);
 
-            // Create the data
-            String myData = params[1];
+
 
             // Enable writing
             connection.setDoOutput(true);
-            connection.setRequestProperty("Accept-Charset", "UTF-8");
+            //connection.setRequestProperty("Accept-Charset", "UTF-8");
 
             // Write the data
             connection.getOutputStream().write(myData.getBytes());

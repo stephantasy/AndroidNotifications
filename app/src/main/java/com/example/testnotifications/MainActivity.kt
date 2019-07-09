@@ -5,8 +5,12 @@ import android.os.Bundle
 import android.util.JsonReader
 import android.util.Log
 import android.view.View
+import android.widget.RadioButton
+import android.widget.RadioGroup
+import android.widget.Switch
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.get
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.iid.FirebaseInstanceId
 import kotlinx.android.synthetic.main.activity_main.*
@@ -17,30 +21,25 @@ import javax.net.ssl.HttpsURLConnection
 
 class MainActivity : AppCompatActivity() {
 
+    private var MY_TOKEN: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Get token
+        retrieveMyToken()
+
         // TOKEN BUTTON
         logTokenButton.setOnClickListener {
-            // Get token
-            // [START retrieve_current_token]
-            FirebaseInstanceId.getInstance().instanceId
-                .addOnCompleteListener(OnCompleteListener { task ->
-                    if (!task.isSuccessful) {
-                        Log.w(TAG, "getInstanceId failed", task.exception)
-                        return@OnCompleteListener
-                    }
 
-                    // Get new Instance ID token
-                    val token = task.result?.token
+            if(MY_TOKEN == "")
+                retrieveMyToken()
 
-                    // Log and toast
-                    val msg = getString(R.string.msg_token_fmt, token)
-                    Log.d(TAG, msg)
-                    Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
-                })
-            // [END retrieve_current_token]
+            // Log and toast
+            val msg = getString(R.string.msg_token_fmt, MY_TOKEN)
+            Log.d(TAG, msg)
+            Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
         }
 
         // CATCH THE NOTIFICATION THAT OPENED THE APP
@@ -51,7 +50,7 @@ class MainActivity : AppCompatActivity() {
             // get data via the key
             val value1 = extras.getString(Intent.EXTRA_TEXT)
             if (value1 != null) {
-                Log.v(MainActivity.TAG, value1)
+                Log.v(TAG, value1)
             }
 
             // List all data
@@ -75,10 +74,68 @@ class MainActivity : AppCompatActivity() {
             loadPage2()
         }
 
+        // Set language
+        /*var currentLanguage = getLanguageFromApi()
+        if(currentLanguage != "English"){
+            rg_langues.check(R.id.rb_french)
+        }*/
+
         // LANGUAGE RADIO-BUTTONS
+        rg_langues.setOnCheckedChangeListener(
+            RadioGroup.OnCheckedChangeListener { group, checkedId ->
+                val radio: RadioButton = findViewById(checkedId)
 
+                // Tell API that the language has changed
+                // TODO
 
+                // Subscribe to the appropriate Topic
+                subscribeToTopic(getTopicName(rg_langues.checkedRadioButtonId), getOldTopicName(rg_langues.checkedRadioButtonId))
 
+                // Make me a toast!
+                Toast.makeText(applicationContext," On checked change : ${radio.text}",
+                    Toast.LENGTH_SHORT).show()
+            })
+    }
+
+    private fun retrieveMyToken(){
+        // Get token
+        // [START retrieve_current_token]
+        FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener(OnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Log.w(TAG, "getInstanceId failed", task.exception)
+                    return@OnCompleteListener
+                }
+
+                // Get new Instance ID token
+                MY_TOKEN = task.result?.token
+            })
+        // [END retrieve_current_token]
+    }
+
+    private fun subscribeToTopic(newTopic:String, oldTopic:String) {
+        val myUrl = "http://192.168.6.120:8080/notification/subscribeToTopic/"
+        val result: String
+        val getRequest = HttpPostRequest()
+        result = getRequest.execute(myUrl, "deviceToken=$MY_TOKEN&newTopic=$newTopic&oldTopic=$oldTopic").get()
+        Log.d(TAG, "HTTP request= $result")
+    }
+
+    private fun getTopicName(radioButtonId: Int):String{
+        var result = ""
+        when(radioButtonId){
+            rb_English.id -> result = TOPIC_ENGLISH
+            rb_french.id -> result = TOPIC_FRENCH
+        }
+        return result
+    }
+
+    private fun getOldTopicName(radioButtonId: Int):String{
+        var result = ""
+        when(radioButtonId){
+            rb_English.id -> result = TOPIC_FRENCH
+            rb_french.id -> result = TOPIC_ENGLISH
+        }
+        return result
     }
 
     private fun loadPage2() {
@@ -87,6 +144,9 @@ class MainActivity : AppCompatActivity() {
         finish()
     }
 
+    private fun getLanguageFromApi():String{
+        return ""
+    }
 
     // Send notification to itself
     fun sendNotificationToMe(v: View){
@@ -97,9 +157,12 @@ class MainActivity : AppCompatActivity() {
         //Instantiate new instance of our class
         val getRequest = HttpPostRequest()
         //Perform the doInBackground method, passing in our url
-        result = getRequest.execute(myUrl, "recipientId=3fb9c8d8-c703-4bd5-97bd-a0a117414f7b").get()
+        result = getRequest.execute(myUrl, "recipientId=$MY_ID").get()
         Log.d(TAG, "HTTP request= $result")
         Toast.makeText(baseContext, result, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun changeLanguage(){
     }
 
     // Send Notification to Topic
@@ -163,6 +226,9 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "MainActivity"
+        private const val MY_ID = "3fb9c8d8-c703-4bd5-97bd-a0a117414f7b"
         private const val REDMI_TOKEN = "cC6htAMkqAc:APA91bFcTW_fN1d8WATnrAGMyjBcEyO8owMsd802JDRV0WBq0pJmFsTVAysr7A4nk4lSdwir2qcaCXtpoJjH1cQkgPS4FxniK47GOWGyqY3MiTnHCqB4S1ws1Ve5u2312iL6fkbvWVhO"
+        private const val TOPIC_ENGLISH = "TopicEnglish"
+        private const val TOPIC_FRENCH = "TopicFrench"
     }
 }
