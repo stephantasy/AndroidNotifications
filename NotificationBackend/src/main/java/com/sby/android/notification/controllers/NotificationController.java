@@ -41,8 +41,8 @@ public class NotificationController {
 
     @RequestMapping(value = "/subscribeToTopic/", method = RequestMethod.POST)
     @ApiOperation(value = "Subscribe to a topic")
-    public String subscribeToTopic(){
-        return "";
+    public String subscribeToTopic(@RequestParam String deviceToken, @RequestParam String newTopic, @RequestParam String oldTopic){
+        return notificationService.changeSubscription(deviceToken, newTopic, oldTopic);
     }
 
 

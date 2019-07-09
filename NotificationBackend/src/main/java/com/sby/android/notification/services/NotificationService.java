@@ -3,10 +3,7 @@ package com.sby.android.notification.services;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingException;
-import com.google.firebase.messaging.Message;
-import com.google.firebase.messaging.Notification;
+import com.google.firebase.messaging.*;
 import com.sby.android.notification.exceptions.CustomHttpException;
 import com.sby.android.notification.exceptions.NotFoundException;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class NotificationService {
@@ -82,5 +81,70 @@ public class NotificationService {
             throw new CustomHttpException("Cannot send notification: " + e.getMessage() + ": " + e.getErrorCode(), 404);
         }
         return response;
+    }
+
+    public String changeSubscription(String deviceToken, String newTopic, String oldTopic) {
+
+        if(deviceToken == null || deviceToken.isEmpty())
+            throw new NotFoundException("Notification Service Error: Token is empty");
+        if(newTopic == null || newTopic.isEmpty())
+            throw new NotFoundException("Notification Service Error: New Topic is empty");
+        if(oldTopic == null || oldTopic.isEmpty())
+            throw new NotFoundException("Notification Service Error: Old Topic is empty");
+
+        // Init
+        InitFirebaseApp();
+
+        String result = unsubscribeToTopic(deviceToken, oldTopic);
+        result += '\n' + "--------------------------" + '\n';
+        result += subscribeToTopic(deviceToken, newTopic);
+        return result;
+    }
+
+    private String unsubscribeToTopic(String deviceToken, String topic) {
+        // These registration tokens come from the client FCM SDKs.
+        List<String> registrationTokens = Arrays.asList(
+                deviceToken
+        );
+
+        // Subscribe the devices corresponding to the registration tokens to the
+        // topic.
+        TopicManagementResponse response = null;
+        try {
+            response = FirebaseMessaging.getInstance().unsubscribeFromTopic(registrationTokens, topic);
+        } catch (FirebaseMessagingException e) {
+            e.printStackTrace();
+        }
+
+        // See the TopicManagementResponse reference documentation
+        // for the contents of response.
+        var result = response.getSuccessCount() + " tokens were unsubscribed successfully";
+        result += "\n" + response.getFailureCount() + " tokens were in failure to cancel subscription";
+        System.out.println(result);
+
+        return result;
+    }
+
+    private String subscribeToTopic(String deviceToken, String topic){
+        // These registration tokens come from the client FCM SDKs.
+        List<String> registrationTokens = Arrays.asList(
+                deviceToken
+        );
+
+        // Subscribe the devices corresponding to the registration tokens to the topic.
+        TopicManagementResponse response = null;
+        try {
+            response = FirebaseMessaging.getInstance().subscribeToTopic(registrationTokens, topic);
+        } catch (FirebaseMessagingException e) {
+            e.printStackTrace();
+        }
+
+        // See the TopicManagementResponse reference documentation
+        // for the contents of response.
+        var result = response.getSuccessCount() + " tokens were subscribed successfully";
+        result += "\n" + response.getFailureCount() + " tokens were in failure for subscription";
+        System.out.println(result);
+
+        return result;
     }
 }
