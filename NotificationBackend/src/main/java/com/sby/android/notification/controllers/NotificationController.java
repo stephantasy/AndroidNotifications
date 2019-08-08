@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.UUID;
 
 @RequestMapping("/notification")
@@ -46,6 +47,12 @@ public class NotificationController {
     }
 
 
+    @RequestMapping(value = "/sendNotificationToTopic/", method = RequestMethod.POST)
+    @ApiOperation(value = "Send a notification to all subscribers of a topic")
+    public String sendNotificationToTopic(@RequestParam String topicName){
+        return notificationService.sendNotificationToTopic(topicName);
+    }
+
 
     @RequestMapping(value = "/testGet/", method = RequestMethod.GET)
     @ApiOperation(value = "Test a get action")
@@ -53,4 +60,15 @@ public class NotificationController {
         return "Get worked!!!";
     }
 
+
+    @RequestMapping(value = "/getAccessToken/", method = RequestMethod.GET)
+    @ApiOperation(value = "Get an access token")
+    public String giveMeAnAccessToken(){
+        try {
+            return notificationService.getAnAccessToken();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "Error: Enable to get that...";
+        }
+    }
 }

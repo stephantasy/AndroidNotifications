@@ -1,5 +1,6 @@
 package com.sby.android.notification.services;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -26,29 +27,42 @@ public class NotificationService {
 
     private void InitFirebaseApp() {
         if(FirebaseApp.getApps().size() == 0) {
-            // Crete Service Account
-            InputStream serviceAccount = null;
-            try {
-                serviceAccount = new ClassPathResource(googleApplicationCredentials).getInputStream();
-            } catch (IOException e) {
-                throw new NotFoundException("Notification Service Error: Unable to find Google Application Credentials");
-            }
 
             // Create App Options
-            FirebaseOptions options;
-            try {
-                options = new FirebaseOptions.Builder()
-                        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                        .setDatabaseUrl(firebaseDatabaseUrl)
-                        .build();
-            } catch (IOException e) {
-                throw new NotFoundException("Notification Service Error: Unable to find App on Firebase");
-            }
+            FirebaseOptions options = new FirebaseOptions.Builder()
+                    .setCredentials(getGoogleCredentials())
+                    .setDatabaseUrl(firebaseDatabaseUrl)
+                    .build();
 
             // Initialize and get the default app
             FirebaseApp.initializeApp(options);
         }
     }
+
+    private GoogleCredentials getGoogleCredentials() {
+
+        GoogleCredentials googleCredentials;
+
+        try {
+            googleCredentials = GoogleCredentials.fromStream(getServiceAccount());
+        } catch (IOException e) {
+            throw new NotFoundException("Notification Service Error: Unable to find App on Firebase");
+        }
+
+        return googleCredentials;
+    }
+
+    private InputStream getServiceAccount() {
+        // Crete Service Account
+        InputStream serviceAccount = null;
+        try {
+            serviceAccount = new ClassPathResource(googleApplicationCredentials).getInputStream();
+        } catch (IOException e) {
+            throw new NotFoundException("Notification Service Error: Unable to find Google Application Credentials");
+        }
+        return serviceAccount;
+    }
+
 
     private Message createMessage(String deviceToken){
 
@@ -146,5 +160,58 @@ public class NotificationService {
         System.out.println(result);
 
         return result;
+    }
+
+
+    public String sendNotificationToTopic(String topicName) {
+
+        // Init
+        InitFirebaseApp();
+
+        // Notification message
+        Message message = createMessageForTopic(topicName);
+
+        // Send a message to the device corresponding to the provided registration token.
+        String response;
+        try {
+            response = FirebaseMessaging.getInstance().send(message);
+        } catch (FirebaseMessagingException e) {
+            // Error info: https://firebase.google.com/docs/cloud-messaging/send-message#admin_sdk_error_reference
+            throw new CustomHttpException("Cannot send notification: " + e.getMessage() + ": " + e.getErrorCode(), 404);
+        }
+
+        // Even if the topic doesn't exist, the answer looks the same as it was a valid topic...
+        if(response == ""){
+            // TODO
+        }
+
+        return "Done!";
+    }
+
+    private Message createMessageForTopic(String topicName){
+
+        // This registration token comes from the client FCM SDKs.
+        Notification notification = new Notification( "Notification Title", "This is the body. It will open the Page 2 of the application!");
+
+        return Message.builder()
+                .setNotification(notification)
+                .putData("OpenPage", "Page2")
+                .setTopic(topicName)
+                .build();
+    }
+
+
+    public String getAnAccessToken() throws IOException {
+        return getAccessToken();
+    }
+
+    private static final String MESSAGING_SCOPE = "https://www.googleapis.com/auth/firebase.messaging";
+    private static final String[] SCOPES = { MESSAGING_SCOPE };
+    private String getAccessToken() throws IOException {
+        GoogleCredential googleCredential = GoogleCredential
+                .fromStream(getServiceAccount())
+                .createScoped(Arrays.asList(SCOPES));
+        googleCredential.refreshToken();
+        return googleCredential.getAccessToken();
     }
 }
