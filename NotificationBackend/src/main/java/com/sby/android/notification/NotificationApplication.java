@@ -2,6 +2,7 @@ package com.sby.android.notification;
 
 import com.sby.android.notification.entities.User;
 import com.sby.android.notification.repositories.UserRepository;
+import com.sby.android.notification.services.NotificationService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -44,9 +45,11 @@ public class NotificationApplication {
 class DataBootstrap implements CommandLineRunner {
 
     private UserRepository userRepository;
+    private NotificationService notificationService;
 
-    public DataBootstrap(UserRepository userRepository) {
+    public DataBootstrap(UserRepository userRepository, NotificationService notificationService) {
         this.userRepository = userRepository;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -58,6 +61,10 @@ class DataBootstrap implements CommandLineRunner {
         if(!userRepository.existsById(user.getId())) {
             userRepository.save(user);
         }
+
+
+        // Init
+        notificationService.InitFirebaseApp();
     }
 
 }

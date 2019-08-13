@@ -1,5 +1,6 @@
 package com.sby.android.notification.controllers;
 
+import com.sby.android.notification.Enums.Topic;
 import com.sby.android.notification.entities.User;
 import com.sby.android.notification.services.NotificationService;
 import com.sby.android.notification.services.UserService;
@@ -31,25 +32,25 @@ public class NotificationController {
     @ApiOperation(value = "Send a notification to a specific User")
     public String sendNotificationToUser(@RequestParam UUID recipientId){
         User user = userService.getUserById(recipientId);
-        return notificationService.sendNotification(user.getDeviceToken());
+        return notificationService.sendNotificationToDevice(user.getDeviceToken());
     }
 
     @RequestMapping(value = "/send/token/", method = RequestMethod.POST)
     @ApiOperation(value = "Send a notification to a specific User")
     public String sendNotificationToToken(@RequestParam String deviceToken){
-        return notificationService.sendNotification(deviceToken);
+        return notificationService.sendNotificationToDevice(deviceToken);
     }
 
     @RequestMapping(value = "/subscribeToTopic/", method = RequestMethod.POST)
     @ApiOperation(value = "Subscribe to a topic")
     public String subscribeToTopic(@RequestParam String deviceToken, @RequestParam String newTopic, @RequestParam String oldTopic){
-        return notificationService.changeSubscription(deviceToken, newTopic, oldTopic);
+        return notificationService.changeTopicSubscription(deviceToken, newTopic, oldTopic);
     }
 
 
     @RequestMapping(value = "/sendNotificationToTopic/", method = RequestMethod.POST)
     @ApiOperation(value = "Send a notification to all subscribers of a topic")
-    public String sendNotificationToTopic(@RequestParam String topicName){
+    public String sendNotificationToTopic(@RequestParam Topic topicName){
         return notificationService.sendNotificationToTopic(topicName);
     }
 
@@ -71,4 +72,14 @@ public class NotificationController {
             return "Error: Enable to get that...";
         }
     }
+
+
+    @RequestMapping(value = "/restAPI/", method = RequestMethod.GET)
+    @ApiOperation(value = "Get data from another REST API")
+    public String getDataFromEvis(){
+        return notificationService.getDataFromEvisServer();
+    }
+
+
+
 }

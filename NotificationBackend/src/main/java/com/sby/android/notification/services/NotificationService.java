@@ -5,11 +5,13 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.*;
+import com.sby.android.notification.Enums.Topic;
 import com.sby.android.notification.exceptions.CustomHttpException;
 import com.sby.android.notification.exceptions.NotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,7 +27,7 @@ public class NotificationService {
     @Value("${firebase.Database.url}")
     private String firebaseDatabaseUrl;
 
-    private void InitFirebaseApp() {
+    public void InitFirebaseApp() {
         if(FirebaseApp.getApps().size() == 0) {
 
             // Create App Options
@@ -64,7 +66,7 @@ public class NotificationService {
     }
 
 
-    private Message createMessage(String deviceToken){
+    private Message createBasicMessage(String deviceToken){
 
         // This registration token comes from the client FCM SDKs.
         Notification notification = new Notification( "Notification Title", "This is the body. It will open the Page 2 of the application!");
@@ -76,7 +78,8 @@ public class NotificationService {
                 .build();
     }
 
-    public String sendNotification(String deviceToken) {
+
+    public String sendNotificationToDevice(String deviceToken) {
         if(deviceToken == null || deviceToken.isEmpty())
             throw new NotFoundException("Notification Service Error: Token is empty");
 
@@ -84,7 +87,7 @@ public class NotificationService {
         InitFirebaseApp();
 
         // Notification message
-        Message message = createMessage(deviceToken);
+        Message message = createBasicMessage(deviceToken);
 
         // Send a message to the device corresponding to the provided registration token.
         String response;
@@ -97,7 +100,7 @@ public class NotificationService {
         return response;
     }
 
-    public String changeSubscription(String deviceToken, String newTopic, String oldTopic) {
+    public String changeTopicSubscription(String deviceToken, String newTopic, String oldTopic) {
 
         if(deviceToken == null || deviceToken.isEmpty())
             throw new NotFoundException("Notification Service Error: Token is empty");
@@ -163,7 +166,7 @@ public class NotificationService {
     }
 
 
-    public String sendNotificationToTopic(String topicName) {
+    public String sendNotificationToTopic(Topic topicName) {
 
         // Init
         InitFirebaseApp();
@@ -188,15 +191,54 @@ public class NotificationService {
         return "Done!";
     }
 
-    private Message createMessageForTopic(String topicName){
+    private Message createMessageForTopic(Topic topicName){
 
         // This registration token comes from the client FCM SDKs.
-        Notification notification = new Notification( "Notification Title", "This is the body. It will open the Page 2 of the application!");
+        Notification notification = new Notification(
+                "Notification Title",
+                "This is the body. It will open the Page 2 of the application!");
 
-        return Message.builder()
+        Message message = Message.builder()
                 .setNotification(notification)
+                .setAndroidConfig(getAndroidConfig())
+                .setApnsConfig(getApnsConfig())
                 .putData("OpenPage", "Page2")
-                .setTopic(topicName)
+                .setTopic(topicName.toString())
+                .build();
+
+        return message;
+    }
+
+    // Specificities for IOS Devices
+    private Aps getApsNotification() {
+        return Aps.builder()
+                .setBadge(42)
+                .setSound("bingbong.aiff")
+                .build();
+    }
+
+    // Specificities for IOS Environment
+    private ApnsConfig getApnsConfig() {
+        return ApnsConfig.builder()
+                .setAps(getApsNotification())
+                .setFcmOptions(ApnsFcmOptions.withAnalyticsLabel("Notifications-IOS"))
+                .build();
+    }
+
+    // Specificities for Android Devices
+    private AndroidNotification getAndroidNotification() {
+        return AndroidNotification.builder()
+                .setIcon("stock_ticker_update")
+                .setColor("#f45342")
+                .build();
+    }
+
+    // Specificities for Android Environment
+    private AndroidConfig getAndroidConfig() {
+        return AndroidConfig.builder()
+                .setTtl(3600 * 1000)    // Notification life time ; max 4 weeks
+                .setNotification(getAndroidNotification())
+                .setFcmOptions(AndroidFcmOptions.withAnalyticsLabel("Notifications-Android"))
                 .build();
     }
 
@@ -205,6 +247,7 @@ public class NotificationService {
         return getAccessToken();
     }
 
+    // This is a limited time token for HTTP V1 API request (for POSTMAN for instance)
     private static final String MESSAGING_SCOPE = "https://www.googleapis.com/auth/firebase.messaging";
     private static final String[] SCOPES = { MESSAGING_SCOPE };
     private String getAccessToken() throws IOException {
@@ -214,4 +257,20 @@ public class NotificationService {
         googleCredential.refreshToken();
         return googleCredential.getAccessToken();
     }
+
+
+    // Test to fetcing data from another REST API
+    public String getDataFromEvisServer()
+    {
+        final String uri = "https://phil27-evis-api-mock.intech-lab.com/evis/events/";
+
+        RestTemplate restTemplate = new RestTemplate();
+        String result = restTemplate.getForObject(uri, String.class);
+
+        System.out.println(result);
+
+        return result;
+    }
+
+
 }
